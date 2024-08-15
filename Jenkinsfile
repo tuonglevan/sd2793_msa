@@ -52,5 +52,18 @@ pipeline {
                 }
             }
        }
+       stage('Deploy to EkS') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                       aws eks update-kubeconfig --name sd2793-devops-eks-cluster
+                       kubectl apply -f k8s/aws/mongodb.yaml
+                       kubectl apply -f k8s/aws/backend.yaml
+                       kubectl apply -f k8s/aws/frontend.yaml
+                    '''
+                }
+            }
+       }
     }
 }
