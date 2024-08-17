@@ -45,7 +45,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    uploadDockerImageToECR(env.REGION, env.ECR_URI, env.ECR_BACKEND_IMAGE_NAME)
+                    uploadDockerImageToECR(env.REGION, env.ECR_URI, env.ECR_BACKEND_IMAGE_NAME, env.BUILD_ID)
                 }
             }
         }
@@ -53,7 +53,7 @@ pipeline {
             agent any
             steps {
                 script {
-                  uploadDockerImageToECR(env.REGION, env.ECR_URI, env.ECR_FRONTED_IMAGE_NAME)
+                  uploadDockerImageToECR(env.REGION, env.ECR_URI, env.ECR_FRONTED_IMAGE_NAME, env.BUILD_ID)
                 }
             }
        }
