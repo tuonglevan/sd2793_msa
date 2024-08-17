@@ -65,10 +65,10 @@ pipeline {
                     credentialsId: env.AWS_CREDENTIALS_ID
                 ]]) {
                     sh '''
-                       echo "Cluster name: ${env.EKS_CLUSTER_NAME}"
+                       echo "Cluster name: gacon"
 
                        # Update kubeconfig
-                       aws eks update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
+                       aws eks update-kubeconfig --name sd2793-devops-eks-cluster
                        # Deploy to EKS
                        kubectl apply -f k8s/aws/mongodb.yaml
                        kubectl apply -f k8s/aws/backend.yaml
