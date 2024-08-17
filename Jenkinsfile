@@ -62,7 +62,16 @@ pipeline {
             steps {
                 withAWS(region: env.REGION, credentials: env.AWS_CREDENTIALS_NAME) {
                     sh '''
+                       #!/bin/bash
+                       set -ex
+
+                       # Debug information
+                       echo "Using AWS region: ${env.REGION}"
+                       echo "EKS Cluster name: ${env.CLUSTER_NAME}"
+
+                       # Update kubeconfig
                        aws eks update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
+                       # Deploy to EKS
                        kubectl apply -f k8s/aws/mongodb.yaml
                        kubectl apply -f k8s/aws/backend.yaml
                        kubectl apply -f k8s/aws/frontend.yaml
