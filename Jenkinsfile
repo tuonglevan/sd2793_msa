@@ -65,12 +65,7 @@ pipeline {
                     credentialsId: env.AWS_CREDENTIALS_ID
                 ]]) {
                     sh '''
-                       #!/bin/bash
-                       set -ex
-
-                       # Debug information
-                       echo "Using AWS region: ${env.REGION}"
-                       echo "EKS Cluster name: ${env.CLUSTER_NAME}"
+                       echo "Cluster name: ${env.EKS_CLUSTER_NAME}"
 
                        # Update kubeconfig
                        aws eks update-kubeconfig --name ${env.EKS_CLUSTER_NAME}
