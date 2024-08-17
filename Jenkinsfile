@@ -18,7 +18,7 @@ pipeline {
     agent none
     environment {
         REGION = "ap-southeast-1"
-        AWS_CREDENTIALS_NAME = "aws_devops_credentials"
+        AWS_CREDENTIALS_ID = "aws_devops_credentials"
         ECR_URI = "010438499500.dkr.ecr.${REGION}.amazonaws.com"
         ECR_BACKEND_IMAGE_NAME = "backend"
         ECR_FRONTED_IMAGE_NAME = "frontend"
@@ -60,7 +60,10 @@ pipeline {
        stage('Deploy to EkS') {
             agent any
             steps {
-                withAWS(region: env.REGION, credentials: env.AWS_CREDENTIALS_NAME) {
+                 withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: env.AWS_CREDENTIALS_ID
+                ]]) {
                     sh '''
                        #!/bin/bash
                        set -ex
