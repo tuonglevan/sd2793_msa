@@ -1,0 +1,62 @@
+trigger:
+  branches:
+    include:
+      - main
+variables:
+  # Container registry variables
+  LATEST_TAG: "latest"
+  BACKEND_IMAGE: "backend"
+  FRONTEND_IMAGE: "frontend"
+  # Paths
+  K8S_AZURE_DIR: $(System.DefaultWorkingDirectory)/k8s/azure
+# Pool build
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+      - job: DockerBuild
+        displayName: Build and Push Docker Image
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(AZURE_SUBSCRIPTION)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Define reusable function for Docker build and push
+                build_and_push() {
+                  local image_name=$1
+                  local tag=$(ACR_NAME).azurecr.io/${image_name}:$(LATEST_TAG)
+                  docker build -t ${tag} $(System.DefaultWorkingDirectory)/src/${image_name}
+                  docker push ${tag}
+                }
+                
+                # Log in to Azure Container Registry (ACR)
+                az acr login --name $(ACR_NAME)
+                
+                # Build and push images
+                build_and_push $(BACKEND_IMAGE)
+                build_and_push $(FRONTEND_IMAGE)
+  - stage: Deploy
+    displayName: Deploy stage
+    dependsOn: Build
+    jobs:
+      - job: DeployToAKS
+        displayName: Deploy to AKS
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(AZURE_SUBSCRIPTION)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Get AKS credentials
+                az aks get-credentials --resource-group $(AKS_RESOURCE_GROUP) --name $(AKS_CLUSTER_NAME)
+                
+                # Deploy applications
+                kubectl apply -f $(K8S_AZURE_DIR)/mongodb.yaml
+                kubectl apply -f $(K8S_AZURE_DIR)/backend.yaml
+                kubectl apply -f $(K8S_AZURE_DIR)/frontend.yaml
