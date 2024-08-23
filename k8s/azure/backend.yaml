@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: sd2793arc.azurecr.io/backend:latest
+          image: sd2793acr.azurecr.io/backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
